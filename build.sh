@@ -65,7 +65,7 @@ if [[ ! -f temp ]]; then
   echo -e "${GREEN}${CHECK} Moved file to ${EXPORT}!${NC}"
 
   # Cleanup temporary files
-  rm */*.aux *.aux */*.log *.log */*.out *.out
+  rm */*.aux *.aux *.log *.out
 
   echo -e "${GREEN}${CHECK} Cleanup complete!${NC}"
 fi

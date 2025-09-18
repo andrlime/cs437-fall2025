@@ -3,7 +3,7 @@ version: '3'
 tasks:
   open:
     cmds:
-      - open math311_notes.pdf
+      - open cs437_notes.pdf
     silent: true
   preview:
     cmds:
@@ -16,7 +16,7 @@ tasks:
   clean:
     cmds:
       - rm main.toc
-      - rm math311_notes.pdf 
+      - rm cs437_notes.pdf 
     silent: true
   o:
     cmds:

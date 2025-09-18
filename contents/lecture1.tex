@@ -42,30 +42,31 @@ As is standard, we can use the proof environment for proofs.
 \subsection{Set Cover}
 \begin{definition}
     \textbf{Set Cover} Let $V$ be some universe, with $\abs{V} = n$. Let
-    \begin{align}
+    \e{
         S_1, \ldots, S_m \subseteq V
-    \end{align}
+    }
     such that $\bigcup_i S_i = V$. Select the smallest $I \subseteq \{ 1, \ldots, m \}$ such that $\bigcup_{i \in I} S_i = V$.
 \end{definition}
 
 \begin{example}
     Let $V \equiv \{ 1, 2, 3, 4, 5 \}$ and sets be pairs $\{ i, j \}$ such that $i \ne j$. Then, an optimal solution is
-    \begin{align}
+    \e{
         I \equiv \left\{ \{ 1, 2 \}, \{ 3, 4 \}, \{ 1, 5 \} \right\}
-    \end{align}
+    }
     In this case, $\text{opt}(I) = 3$
 \end{example}
 
 \begin{definition}
     The approximation factor of an algorithm is $\alpha_n$ if for every $I$ of size $n$, we have
-    \begin{align}
+    \e{
         \text{alg}(I) \le \alpha_n \cdot \text{opt}(I)
-    \end{align}
+    }
 \end{definition}
 
 The first theorem of this course is
 \begin{theorem}
     There exists a polynomial time algorithm with approximation factor $\log n$.
+
     \begin{algorithm}[H]
         \caption{Polynomial time set cover approximation algorithm}
         \DontPrintSemicolon
@@ -82,4 +83,57 @@ The first theorem of this course is
 \end{theorem}
 
 \subsubsection{Proof}
+Let $k = \text{opt}$ be the number of sets in the optimal solution. Let $S_{i_1}$ be the first selected set. Then,
+\e{
+    \abs{S_{i_1}} \ge \frac{n}{k}
+}
+Then it follows that
+\e{
+    \abs{U_1} &= \abs{\underbracket{U_0}_{V} \setminus S_{i_1}} = \underbracket{\abs{U_0}}_{n} - \abs{S_{i_1}} \\
+    &\le n - \frac{n}{k} = n\qty(1 - \frac{1}{k})
+}
+Let $S_{i_{t+1}}$ be the set chosen at iteration $t$.
+\begin{lemma}
+    \e{
+        \bigcup_{i \in I^*} S_i \cap U_t = U_t
+    }
+\end{lemma}
+\begin{proof}
+    We can prove that LHS $\subseteq$ RHS and RHS $\subseteq$ LHS. To prove the first,
+    \e{
+        u \in \bigcup_{i \in I^*} S_i \cap U_t &\implies u \in \text{at least one $S_i \cap U_t$} \implies u \in U_t
+    }
+    Thus, every element in one of the chosen sets' intersection with $U_t$ is in $U_t$.
+    \e{
+        u \in U_t &\implies u \in \text{at least one $S_i$} & \text{$I^*$ spans universe; $S_i$ must exist}\\
+        &\implies u \in \text{at least one $S_i \cap U_t$}\\
+        &\implies u \in \bigcup_{i \in I^*} S_i \cap U_t
+    }
+    And, every element in $U_t$ is in at least one set.
+\end{proof}
 
+It follows that, because $S_i$ are not necessarily disjoint sets,
+\e{
+    \sum_{i \in I^*} \abs{S_i \cap U_t} \ge \abs{U_t}
+}
+Thus, given there are $k$ sets in $I^*$, by pigeonhole,
+\e{
+    \exists i \qsp \abs{S_i \cap U_t} \ge \frac{\abs{U_t}}{k}
+}
+Then,
+\e{
+    \abs{U_{t+1}}
+        &= \abs{U_t \setminus (S_{i_{t+1}} \cap U_t)} \\
+        &= \abs{U_t} - \abs{S_{i_{t+1}} \cap U_t} \\
+        &\le \abs{U_t} - \frac{\abs{U_t}}{k} = \left( 1 - \frac{1}{k} \right) \abs{U_t}
+}
+Trivially,
+\e{
+    \abs{U_t} \le \left( 1 - \frac{1}{k} \right)^t \cdot n
+}
+\begin{proposition}
+    For $t = k \log n$,
+    \e{
+        \left( 1 - \frac{1}{k} \right)^t < \frac{1}{n}
+    }
+\end{proposition}
