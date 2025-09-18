@@ -1,1 +1,188 @@
 \section{September 18, 2025}
+
+\subsection{Finishing Previous Proof}
+
+Recall some universe $V$, some family of sets $S_1, \ldots, S_m \subseteq V$, want to minimise size of family that spans entire $V$.
+
+\begin{aside}
+    All solutions are feasible, as the algorithm stops when $U_t = \emptyset$, i.e. when the selected sets span $V$. If there is no feasible solution, then the algorithm can just terminate when there are no more sets to select.
+\end{aside}
+
+Recall $k$ is the number in the optimal solution.
+
+\begin{lemma}
+    For $t^* = k \log n$,
+    \e{
+        \qty(1 - \frac{1}{k})^{t^*} < \frac{1}{n}
+    }
+    If this is true, then
+    \e{
+        \abs{U_{t^*}} < \frac{1}{n} \cdot n < 1
+    }
+    which implies $\abs{U_{t^*}} \equiv 0$. That imposes an upper bound on the time steps $t$ needed to cover all elements.
+\end{lemma}
+
+\begin{proof}
+    Use the well-known definition of $e$
+    \e{
+        \qty(1 - \frac{1}{k})^{k\log n} &= \qty(\qty(1 - \frac{1}{k})^k)^{\log n} \\
+        &< \qty(1/e)^{\log n}\\
+        &< 1/n
+    }
+\end{proof}
+
+\begin{aside}
+    When $x \approx 0$,
+    \e{
+        e^{-x} \approx 1-x
+    }
+    In general,
+    \e{
+        1 - x < e^{-x}
+    }
+\end{aside}
+
+\subsection{Weighted Set Cover Problem}
+
+\begin{definition}
+    \textbf{Weighted Set Cover Problem}
+    Let $V$ be some universe, $S_1, \ldots, S_m \subseteq V$. Select sets of minimum cost that cover $V$, where set $S_i$ has cost/weight $w_i$.
+\end{definition}
+
+WLOG, we can assume strictly-positive costs (zero cost can be dealt with in pre-processing).
+
+\begin{theorem}
+    The algorithm for this is the same as before, but we select sets differently. We cannot ignore the cost.
+
+    \begin{algorithm}[H]
+        \caption{Polynomial time set cover approximation algorithm}
+        \DontPrintSemicolon
+        $U_0 \leftarrow V$ \tcp{set of not yet covered elements in $V$}
+        $t \leftarrow 0$ \tcp{iteration counter}
+        \For{$U_t \ne \emptyset$}{
+            \text{Select $S_i$ from sets that maximises new elements per cost $\frac{\abs{S_i \cap U_t}}{w_i}$}\;
+            \text{Include $S_i$ in soln}\;
+            \text{$U_t \leftarrow U_{t} \setminus S_i$}\;
+            \text{$t \leftarrow t + 1$}\;
+        }
+        \Return{soln}
+    \end{algorithm}
+
+    So we maximise new elements per cost, or minimise cost per new element.
+\end{theorem}
+
+\begin{proof}
+    Prove by induction, on $\abs{U_t} \le \qty(1 - \frac{1}{k})^t \cdot n$. In this problem, that is analogous to
+    \e{
+        \abs{U_t} \le \exp\qty(-\frac{W_t}{\text{opt}}) \cdot n
+    }
+    Base case, if $t = 0$, then $w_t = 0$ and obviously
+    \e{
+        \abs{U_0} = n
+    }
+    Inductive step, assume inequality holds for some $t$,
+    \e{
+        \abs{U_t} \le \exp\qty(-\frac{W_t}{\text{opt}}) \cdot n
+    }
+    we can prove for $t+1$
+    \e{
+        \abs{U_{t+1}} \le \exp\qty(-\frac{W_{t+1}}{\text{opt}}) \cdot n
+    }
+    Let $S_{i_t}$ be the set we select at step $t$. Then
+    \e{
+        \frac{\abs{S_{i_t} \cap U_t}}{w_{i_t}}
+    }
+    is as large as possible per the greedy algorithm.
+    \begin{lemma}
+        \textbf{Claim}
+        \e{
+            \frac{\abs{S_{i_t} \cap U_t}}{w_{i_t}} \ge \frac{\abs{U_t}}{\text{opt}}
+        }
+    \end{lemma}
+    \begin{proof}[Proof of Claim]
+        Let $I^*$ be the set of indices of sets in $\texttt{opt}$.
+        \e{
+            \bigcup_{i \in I^*} S_i \cap U_t = U_t
+        }
+        This was proven earlier. Based on the proof from before,
+        \e{
+            \sum_{i \in I^*} \frac{\abs{S_i \cap U_t}}{\text{opt}}
+            \ge \frac{\abs{U_t}}{\text{opt}}
+        }
+        This expands into
+        \e{
+            \sum_{i \in I^*} \frac{\abs{S_i \cap U_t}}{w_i} \cdot \frac{w_i}{\text{opt}}
+            \ge \frac{\abs{U_t}}{\text{opt}} 
+        }
+        What if we only sum the $w_i / \text{opt}$? We get $1$. This above dot product is then a weighted sum of elements per cost. We conclude that
+        \e{
+            \exists i \qsp \frac{\abs{S_i \cap U_t}}{w_i} \ge \frac{U_t}{\text{opt}}
+        }
+        The greedy algorithm will choose the maximum so it will pick this $S_i$.
+    \end{proof}
+    
+    Then,
+    \e{
+        \abs{U_{t+1}}
+            &= \abs{U_t} - \abs{(S_{i_t} \cap U_t)}\\
+            &\le n \cdot e^{-W_t / \text{opt}} \qty(1 - \frac{w_{i_t}}{\text{opt}})\\
+            &\le n \cdot e^{-W_t / \text{opt}} \cdot e^{-w_{i_t} / \text{opt}} \\
+            &\le n \cdot e^{-W_{t+1} / \text{opt}}
+    }
+    completing the proof.
+\end{proof}
+
+\subsection{Similar Problems}
+Instead of covering all elements, try to cover as many elements as possible
+\begin{definition}
+    \textbf{Max $k$ Coverage}
+    Choose $k$ sets to cover as many elements as possible. Can just look at the unweighted case.
+\end{definition}
+
+\subsection{Submodular Maximisation}
+
+Take some set $X$, and some subsets $2^X$. Let
+\e{
+    f : 2^X \longrightarrow \real^+
+}
+
+\begin{example}
+    Let $A \subseteq X$, $S_1, \ldots \in A$.
+    Let $f$ be the coverage function,
+    \e{
+        f(A) = \abs{\bigcup_{S \in A} S}
+    }
+\end{example}
+
+Take $A, B \subseteq X$. Obviously,
+\e{
+    f(A \cup B) \le f(A) + f(B)
+}
+is always true.
+
+\begin{definition}
+    \textbf{Subadditive Function}
+    A function
+    \e{
+        f: 2^X \longrightarrow \real^+
+    }
+    is subadditive if
+    \e{
+        f(A) + f(B) \ge f(A \cup B)
+    }
+\end{definition}
+
+\begin{definition}
+    \textbf{Submodular Function}
+    A function
+    \e{
+        f: 2^X \longrightarrow \real^+
+    }
+    is submodular if
+    \e{
+        f(A) + f(B) \ge f(A \cup B) + f(A \cap B)
+    }
+\end{definition}
+
+All submodular functions are also subadditive.
+
