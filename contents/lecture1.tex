@@ -1,0 +1,85 @@
+\section{September 16, 2025}
+I joined this class after this lecture. 
+
+\subsection{Macros}
+Below is an example algorithm using the macros in this repository. For simplicity, this algorithm computes the largest element of a fixed size array.
+
+\begin{algorithm}[H]
+    \caption{Algorithm to compute $\max(\text{list})$}
+    \DontPrintSemicolon
+    \textbf{input} list\;
+    $curmax \leftarrow list[0]$\;
+    \For{$n \in list$}{
+        $curmax \leftarrow \max(n, curmax)$
+    }
+    \Return{curmax}
+\end{algorithm}
+
+There are also other environments, namely
+\begin{lemma}
+    This is a lemma.
+\end{lemma}
+\begin{proposition}
+    and a proposition.
+\end{proposition}
+\begin{definition}
+    and a definition.
+\end{definition}
+\begin{example}
+    These boxes are for examples.
+\end{example}
+\begin{aside}
+    These boxes are sparingly used, for asides.
+\end{aside}
+\begin{theorem}
+    And finally, we've got the theorem.
+\end{theorem}
+As is standard, we can use the proof environment for proofs.
+\begin{proof}
+    Trivial.
+\end{proof}
+
+\subsection{Set Cover}
+\begin{definition}
+    \textbf{Set Cover} Let $V$ be some universe, with $\abs{V} = n$. Let
+    \begin{align}
+        S_1, \ldots, S_m \subseteq V
+    \end{align}
+    such that $\bigcup_i S_i = V$. Select the smallest $I \subseteq \{ 1, \ldots, m \}$ such that $\bigcup_{i \in I} S_i = V$.
+\end{definition}
+
+\begin{example}
+    Let $V \equiv \{ 1, 2, 3, 4, 5 \}$ and sets be pairs $\{ i, j \}$ such that $i \ne j$. Then, an optimal solution is
+    \begin{align}
+        I \equiv \left\{ \{ 1, 2 \}, \{ 3, 4 \}, \{ 1, 5 \} \right\}
+    \end{align}
+    In this case, $\text{opt}(I) = 3$
+\end{example}
+
+\begin{definition}
+    The approximation factor of an algorithm is $\alpha_n$ if for every $I$ of size $n$, we have
+    \begin{align}
+        \text{alg}(I) \le \alpha_n \cdot \text{opt}(I)
+    \end{align}
+\end{definition}
+
+The first theorem of this course is
+\begin{theorem}
+    There exists a polynomial time algorithm with approximation factor $\log n$.
+    \begin{algorithm}[H]
+        \caption{Polynomial time set cover approximation algorithm}
+        \DontPrintSemicolon
+        $U_0 \leftarrow V$ \tcp{set of not yet covered elements in $V$}
+        $t \leftarrow 0$ \tcp{iteration counter}
+        \For{$U_t \ne \emptyset$}{
+            \text{Select $S_i$ from sets that maximises $\abs{S_i \cap U_t}$}\;
+            \text{Include $S_i$ in soln}\;
+            \text{$U_t \leftarrow U_{t} \setminus S_i$}\;
+            \text{$t \leftarrow t + 1$}\;
+        }
+        \Return{soln}
+    \end{algorithm}
+\end{theorem}
+
+\subsubsection{Proof}
+
