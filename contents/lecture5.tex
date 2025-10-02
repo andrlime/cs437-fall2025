@@ -1,0 +1,97 @@
+\section{September 30, 2025}
+
+\subsection{Knapsack}
+Very widespread problem.
+\begin{definition}
+    Given $N$ items with weights $w_1, \ldots, w_N$ and values $v_1, \ldots, v_N$, select a subset $I$ of weight at most $W$, where
+    \begin{align}
+        W(I) = \sum_{i \in I} w_i \le W
+    \end{align}
+    Maximise the value $V$, defined as
+    \begin{align}
+        V(I) = \sum_{i \in I} v_i
+    \end{align}
+    Assume $w_i > 0$, $v_i > 0$, as the zero cases are trivial: never take zero value, always take zero weight. Also assume $w_i \le W$.
+\end{definition}
+
+\begin{lemma}
+    When all weights are equal $w_1 = \cdots = w_N$, greedily take the most valuable items. When all values are equal $v_1 = \cdots = v_N$, greedily take the least heavy items.
+    \begin{proof}
+        Trivial
+    \end{proof}
+\end{lemma}
+
+
+\begin{aside}
+    Haven't we seen this course at the undergraduate level? Yes and we can solve it with dynamic programming. Why do we need an approximation? Because the complexity of the dp algorithm is polynomial in $O(w \cdot N)$.
+    \begin{enumerate}
+        \item If $W \gg 0$ or $N \gg 0$, then the algorithm is too slow.
+        \item If weights/values are floating point, then the algorithm won't be able to index a dp table.
+    \end{enumerate}
+\end{aside}
+
+\subsubsection{Ideas}
+\begin{enumerate}
+    \item Pick the highest value density $\rho_i \equiv v_i/w_i$
+    \item Naively pick the most valuable item (not that great, could be very heavy)
+\end{enumerate}
+
+If items can be taken fractionally, then the most optimal solution is to pick items with the highest value density, and take fractionally if that item's weight is too high.
+\begin{definition}
+    \textbf{Fractional Knapsack Problem} For some items with weights and values, a fraction $r \in [0, 1)$ of an item $i$ can be taken with weight $r\cdot w_i$ and value $r \cdot v_i$.
+\end{definition}
+
+\begin{proposition}
+    The greedy algorithm based on highest value-density finds the optimal solution for the fractional knapsack problem.
+\end{proposition}
+
+\begin{proof}
+    Let $\rho_1 > \rho_2 > \cdots > \rho_N$ be the sorted value-densities, such that this algorithm can be run in $O(N)$ time. Let
+    \begin{align}
+        a_1, a_2, \cdots, a_i, a_{i+1}, \cdots, a_N
+    \end{align}
+    such that $a_1 = a_2 = \cdots = a_i = 1$, and $a_{i+1} \in [0, 1)$, and $a_{i+2}, \cdots, a_N = 0$, be the fractions of the items we take. Let
+    \begin{align}
+        o_1, o_2, \cdots, o_N
+    \end{align}
+    be the optimal solution. Let $j$ be the first index where $a_j \ne o_j$, and $a_j > o_j$ (if less, then that doesn't make sense, because optimal implies space remains). Let
+    \begin{align}
+        \Delta \texttt{OPT} &= \Delta w_j \cdot \rho_j - \sum_{k = j+1}^N \Delta w_k \cdot \rho_k \\
+        &> \Delta w_j \cdot \rho_j - \sum_{k = j+1}^N \Delta w_k \cdot \color{red} \rho_j \\
+        &> \rho_j \qty(\Delta w_j - \sum_{k= j +1}^N \Delta w_k) \\
+        &> \rho_j \Delta W \\
+        &> 0
+    \end{align}
+    because the total weight should remain the same to fill the knapsack. Inductively because this implies that \texttt{OPT} would be non-zero improved, then the optimal solution must equal the algorithmic solution to avoid a contradiction.
+\end{proof}
+
+\begin{example}
+    Let $v_1, w_1 = 1000, 1/10^6$ and $v_2, w_2 = 10^6, 1$, and $W = 1$. Then the highest-density algorithm fails, as it won't take the most valuable item that fits exactly.
+
+\end{example}
+
+For the non-fractional case, we can assume we take the entire fractional item. Formally,
+\begin{align}
+    \texttt{ALG}_1 + v_k &\ge \texttt{OPT}_\text{frac} \ge \texttt{OPT} \\
+    \texttt{ALG}_2 &\ge v_k
+\end{align}
+where $\texttt{ALG}_1$ picks the highest-density item first while $\texttt{ALG}_2$ picks the single most valuable item first.
+
+\begin{proposition}
+    The best of $\texttt{ALG}_1$ and $\texttt{ALG}_2$ gives a 0.5 approximation.
+\end{proposition}
+
+\begin{proof}[Polynomial Time Approximation Scheme]
+
+Let $\delta = \varepsilon / N$, and let
+\begin{align}
+    \texttt{OPT} \le M \le 2\texttt{OPT}
+\end{align}
+Round up every value $v_i$ to a multiple of $\delta M$ such that
+\begin{align}
+    v_i' = \left\lceil \frac{v_i}{\delta M} \right\rceil \cdot \delta M
+\end{align}
+
+\end{proof}
+
+Next time we will finish this proof.

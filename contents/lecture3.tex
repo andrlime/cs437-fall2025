@@ -1,0 +1,160 @@
+\section{September 23, 2025}
+
+\subsection{Submodular Maximisation (cont)}
+Recall the set cover problem, with some universe, and some set of sets that covers the entire universe. Now, maybe we want to pick a minimal subset that covers the entire universe. Or, we want to pick $k$ sets and maximise the coverage of the universe. Recall the definitions
+
+\begin{definition}
+    \textbf{Subadditive Function}
+    A function
+    \e{
+        f: 2^X \longrightarrow \real^+
+    }
+    is subadditive if
+    \e{
+        f(A) + f(B) \ge f(A \cup B)
+    }
+\end{definition}
+
+\begin{definition}
+    \textbf{Submodular Function}
+    A function
+    \e{
+        f: 2^X \longrightarrow \real^+
+    }
+    is submodular if
+    \e{
+        f(A) + f(B) \ge f(A \cup B) + f(A \cap B)
+    }
+\end{definition}
+
+Equivalently, we can write
+\begin{definition}
+    \textbf{Submodular Function}
+    A function
+    \e{
+        f : s^X \longrightarrow \real^+
+    }
+    is submodular if for two subsets $T \subseteq S \subset X$, and some $x \in X \setminus S$. The submodular property gives
+    \e{
+        f(T \cup \{ x \}) - f(T) \ge f(S \cup \{ x \}) - f(S)
+    }
+    A concrete example of this is diminishing utility of some commodity (e.g. money, some ETF, bananas).
+\end{definition}
+
+\begin{proposition}
+    These definitions of submodular function are indeed equivalent.
+\end{proposition}
+
+\begin{proof}
+    We can prove this as $\circled{3.2} \iff \circled{3.3}$
+    \begin{enumerate}
+        \item[($3.2 \implies 3.3$)] We want to prove
+            \e{
+                f(T \cup \{ x \}) - f(T) \stackrel{?}{\ge} f(S \cup \{ x \}) - f(S)
+            }
+            which is equivalent to
+            \e{
+                f(T \cup \{ x \}) + f(S) \stackrel{?}{\ge} f(S \cup \{ x \}) + f(T)
+            }
+            Let $A = T \cup \{ x \}$ and $B = S$. Then,
+            \e{
+                \qty(T \cup \{ x \}) \cup S = S \cup \{ x \} = A \cup B\\
+                \qty(T \cup \{ x \}) \cap S = T = A \cap B
+            }
+            (This is trivial to see with a picture) Thus, the second definition is a consequence of the first.
+        \item[($3.2 \impliedby 3.3$)] We want to prove
+            \e{
+                f(A \cup B) - f(A) \le f(B) - f(A \cap B)
+            }
+            which is pretty obviously equivalent to the first definition. To show this, initially, set $S = \emptyset$, then grow it to $S = B \setminus A$ one element at a time, which follows from the second definition. Then, the end result is
+            \e{
+                f(S \cup A) - f(A) \le f\qty(S \cup (A \cap B)) - f(A \cap B)
+            }
+            which for $S = B \setminus A$, is equivalent to
+            \e{
+                f(A \cup B) - f(A) \le f(B) - f(A \cap B)
+            }
+            (This is true via some very basic basic set theory, but is not basic to see. It is more clear with a picture)
+    \end{enumerate}
+\end{proof}
+
+\subsection{Back to Coverage Functions}
+Let $U$ be some universe, with subsets $S_1, \ldots, S_m \subseteq U$, and $X = \{ S_1, \ldots, S_m \}$. Let the coverage function
+\e{
+    f(A \in X) = \abs{\bigcup_{S_i \in A} S_i}
+}
+Concretely, suppose we have
+\e{
+    f(\{ S_1, S_3 \} \cup \{ S_2 \}) - f(\{ S_1, S_3 \}) = \abs{S_2 \setminus S_1 \setminus S_3}
+}
+If we also have $S_4$, then
+\e{
+    f(\{ S_1, S_3, S_4 \} \cup \{ S_2 \}) - f(\{ S_1, S_3, S_4 \}) = \abs{S_2 \setminus S_1 \setminus S_3 \setminus S_4} \le \abs{S_2 \setminus S_1 \setminus S_3}
+}
+i.e. there are `fewer elements' in the delta of the coverage function. (This is an obvious example, but it is still quite concrete and thus useful.)
+
+\subsection{Maximisation}
+\begin{theorem}
+    The greedy algorithm gives a $1 - e^{-1}$ approximation for monotone submodular maximisation problem in which we need to select a given number of elements.
+\end{theorem}
+\begin{aside}
+    Let $f$ be some monotone function such that
+    \e{
+        f(S \cup \{ x \}) \ge f(S)
+    }
+    Goal is to select $k$ elements $x_1, \ldots, x_k$ to maximise
+    \e{
+        f(\{ x_1, \ldots, x_k \})
+    }
+    Assume that $f(\emptyset) \equiv 0$
+\end{aside}
+\begin{proposition}
+    We specifically want to prove
+    \e{
+        \texttt{ALG} \ge \qty(1 - \frac{1}{e}) \cdot \texttt{OPT}
+    }
+\end{proposition}
+\begin{proof}
+    Denote $\texttt{ALG}_i$ as the value that the greedy algorithm gets after $i$ steps. Also denote
+    \e{
+        \Lambda \equiv \{ x_1^*, \ldots, x_k^* \}
+    }
+    be an optimal solution. Finally, denote
+    \e{
+        \Delta_i \equiv \texttt{OPT} - \texttt{ALG}_i
+    }
+    which we can show shrinks fast. We thus need
+    \e{
+        \texttt{ALG}_{i+1} - \texttt{ALG}_i = ?
+    }
+    Suppose the algorithm has some set $A_j$ at step $i$. Then,
+    \e{
+        \texttt{ALG}_i \equiv f(A_j) \implies f(A_i \cup \Lambda) \ge \texttt{OPT}
+    }
+    Every time we add some $x_j^* \in \Lambda$, we are always lower-bounded on $f$ by $\texttt{OPT}$.
+    \e{
+        f(A_j \cup \{ x_1^*, \ldots, x_{i+1}^* \}) - f(A_j \cup \{ x_1^*, \ldots, x_i^* \}) \ge \frac{\texttt{OPT} - \texttt{ALG}_j}{k}
+    }
+    We can use some submodular math to rewrite
+    \e{
+        f(A_j \cup \{ x_{i+1}^* \}) - f(A_j) \ge \texttt{above}
+    }
+    We ultimately conclude that
+    \e{
+        f(A_{j+1}) - f(A_j) \ge \frac{\texttt{OPT} - \texttt{ALG}_j}{k}
+    }
+    The desired result thus `follows very easily'\footnote{does it?}.
+    \e{
+        \texttt{OPT} - f(A_{j+1}) &\le \texttt{OPT} - \qty(f(A_j) + \frac{\texttt{OPT} - \texttt{ALG}_j}{k}) \\
+        &= \qty(\texttt{OPT} - f(A_j)) \cdot \qty(1 - 1/k)
+    }
+    After $k$ steps, the upper-bound becomes
+    \e{
+        \qty(\qty(1 - 1/k)^k \le 1/e) \cdot \texttt{OPT}
+    }
+    So we finally get
+    \e{
+        f(A_k) \ge \texttt{OPT} \cdot \qty(1 - 1/e)
+    }
+\end{proof}
+

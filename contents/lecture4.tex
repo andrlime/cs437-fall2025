@@ -1,0 +1,74 @@
+\section{September 25, 2025}
+
+The professor started the class with a subtle comment on inflation since 1964.
+
+\subsection{Travelling Salesman Problem (TSP)}
+
+\begin{definition}
+    Let $X$ be some universe, and $x, y \in X$. Let $d(x, y)$ be some distance function. Denote $(X, d)$ as a metric space if
+    \begin{enumerate}
+        \item $d(x, x) = 0$
+        \item Positivity $d(x, y) > 0$
+        \item Symmetry $d(x, y) = d(y, x)$
+        \item Triangle Inequality $d(x, z) \le d(x, y) + d(y, z)$
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}
+    \textbf{Metric TSP}
+
+    Let $(X, d)$ be some metric space. Find the shortest tour that visits $x \in X$ exactly once.
+\end{definition}
+
+There exists a $3/2$-approximation for this problem. First, find a minimum spanning tree for the graph (which is trivial to do in polynomial time).
+\begin{align}
+    \text{cost}(\texttt{MST}) < \texttt{OPT}
+\end{align}
+
+How can we transform the tree into a tour? We can do a depth-first search (which gives us a pre-order traversal).
+\begin{align}
+    \texttt{OPT} \le \qty (
+        \texttt{ALG} = 2 \cdot \text{cost}(\texttt{MST})
+    ) < 2 \cdot \texttt{OPT}
+\end{align}
+
+This comes from visiting every edge twice. We can improve this algorithm by augmenting the tree as
+\begin{align}
+    \underbracket{T}_\text{MST} \cup \underbracket{M}_\text{set of edges}
+\end{align}
+such that we visit every edge exactly once, and then the new cost equals
+\begin{align}
+    \text{cost}(\texttt{ALG}) = \underbrace{\text{cost}(T)}_{\le \texttt{OPT}} + \underbrace{\text{cost}(M)}_{\stackrel{?}{\le} \texttt{OPT}/2}
+\end{align}
+
+This problem is similar to taking some graph and visiting each edge exactly once. That sounds quite a bit like finding an Eulerian cycle.
+
+\subsection{Eulerian Graphs}
+
+\begin{definition}
+    A connected graph $G$ is Eulerian if there exists a \textit{tour} (start and end at the same node) that visits every edge exactly once.
+\end{definition}
+
+\begin{proposition}
+    All vertices in an Eulerian graph must have an even degree.
+\end{proposition}
+
+\begin{theorem}
+    If in a connected graph $G$, all vertices have an even degreee, then $G$ is Eulerian.
+\end{theorem}
+
+\begin{proof}
+    Prove by induction on the number of edges. Let 3 edges be the base case, then a triangle is an Eulerian cycle. Inductively let $G$ be Eulerian and have $k$ edges, then for $k + 1$ edges, split the graph into some connected components, and by the inductive hypothesis, there exists a tour for each, so there exists a tour across all of them too.\footnote{The professor proved it this way... and by waving his hands.}
+\end{proof}
+
+\subsection{Christofides Algorithm}
+
+\begin{enumerate}
+    \item First, find an MST $T$
+    \item Then, take some subset $S \subset G$ of all odd-degree vertices
+    \item The number of elements in $S$ must be even, because if it was odd, then the sum of all degrees would be odd, and that is impossible for any graph because all edges are counted exactly twice.
+    \item Find minimum cost matching for $S$, denoted as $M$
+    \item Find Eulerian tour of $T \cup M$
+\end{enumerate}
+
+The proof of this was literally the professor waving his hands. It was not formalised.
